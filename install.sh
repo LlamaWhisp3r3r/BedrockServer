@@ -60,18 +60,20 @@ if [[ ! -f "$INSTALL_PATH" ]]; then
 
     # Create server user for security reasons
     sudo useradd --system --no-create-home --shell /usr/sbin/nologin bedrockserver
-    sudo chown -R bedrockserver:bedrockserver "$BASE_PATH"
-    sudo chmod -R 750 "$BASE_PATH"
-    sudo chown -R bedrockserver:bedrockserver "$INSTALL_PATH"
-    sudo chmod -R 750 "$INSTALL_PATH"
+    sudo groupadd servergroup
+    sudo usermod -aG servergroup $USER
+    sudo usermod -aG servergroup bedrockserver
+    sudo chgrp -R bedrockgroup /bedrock-server
+    sudo chmod -R 770 /bedrock-server
+    sudo find /bedrock-server -type d -exec chmod g+s {} \;
 
     # Define the cron job
     CRON_JOB="* * * * * bedrockserver $INSTALL_PATH/bedrock_server.sh 2>&1"
 
     # Install the cron job if it's not already present
-    ( sudo -u bedrockserver crontab -l 2>/dev/null | grep -F "$CRON_JOB" ) || (
-        sudo -u bedrockserver crontab -l 2>/dev/null; echo "$CRON_JOB"
-    ) | sudo -u bedrockserver crontab -
+    ( sudo rontab -l 2>/dev/null | grep -F "$CRON_JOB" ) || (
+        sudo crontab -l 2>/dev/null; echo "$CRON_JOB"
+    ) | sudo crontab -
 else
     echo "Could not create maintenance directory at $INSTALL_PATH"
     exit 1
