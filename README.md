@@ -19,18 +19,14 @@ BedrockServer is a cron job-based service manager designed for Minecraft Bedrock
 For your ease of use you can use the provided install script. This will install dependecies and set up the enviroment, server user, etc.
 
 ```bash
-Copy
-Edit
 wget https://raw.githubusercontent.com/LlamaWhisp3r3r/BedrockServer/refs/heads/main/install.sh
 chmod +x ./install.sh
 ./install.sh
-cd BedrockServer
+rm ./install.sh
 ```
 ### Set Executable Permissions:
 
 ```bash
-Copy
-Edit
 chmod +x bedrock_server.sh
 ```
 ### ⚙️ Configuration:
