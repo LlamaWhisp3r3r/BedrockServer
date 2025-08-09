@@ -15,12 +15,15 @@ BedrockServer is a cron job-based service manager designed for Minecraft Bedrock
 **Robust Logging**: Detailed logs for monitoring and troubleshooting.
 
 ## 🛠️ Installation
-### Clone the Repository:
+### Use Install Script:
+For your ease of use you can use the provided install script. This will install dependecies and set up the enviroment, server user, etc.
 
 ```bash
 Copy
 Edit
-git clone https://github.com/LlamaWhisp3r3r/BedrockServer.git
+wget https://raw.githubusercontent.com/LlamaWhisp3r3r/BedrockServer/refs/heads/main/install.sh
+chmod +x ./install.sh
+./install.sh
 cd BedrockServer
 ```
 ### Set Executable Permissions:
@@ -73,9 +76,13 @@ Add the following line to run the script every minute:
 ## 📦 Dependencies
 ### 🐚 Shell
 - chromium-browser
+- jq
+- python3
+- python3-pip
+- python3-venv
 ### 🐍Python > 3.5
 - requests
-- googleapiclient
+- google-api-python-client
 
 
 ## 🤝 Contributing
