@@ -18,14 +18,14 @@ def authenticate():
   # created automatically when the authorization flow completes for the first
   # time.
   if os.path.exists("token.json"):
-    creds = Credentials.from_authorized_user_file("token.json", SCOPES)
+    creds = Credentials.from_authorized_user_file("token.json", SCOPES) # TODO Get token from config file
   # If there are no (valid) credentials available, let the user log in.
   if not creds or not creds.valid:
     if creds and creds.expired and creds.refresh_token:
       creds.refresh(Request())
     else:
       flow = InstalledAppFlow.from_client_secrets_file(
-          "credentials.json", SCOPES
+          "credentials.json", SCOPES # TODO Get credentials path from config file
       )
       creds = flow.run_local_server(port=0)
     # Save the credentials for the next run
@@ -106,12 +106,12 @@ def upload_folder(service, parent_folder_id, local_path):
 
 def upload_backup_folder(service):
   
-  backup_folder_id = get_folder_id_from_name(service, "Backups")
+  backup_folder_id = get_folder_id_from_name(service, "Backups") # TODO Get backups name from config folder
   oldest_file = oldest_file_in_folder(service, backup_folder_id)
   
   delete_file(service, oldest_file['id'])
 
-  local_file_path = "C:\\Users\\natha\\Home\\Coding\\Minecraft Server\\Bash Automations\\Overleving"
+  local_file_path = "" # TODO make local_file_path a part of the config file
   name = datetime.today().strftime('%Y-%m-%d')
   new_folder = create_folder(service, name, backup_folder_id)
   upload_folder(service, new_folder, local_file_path)
