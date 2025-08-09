@@ -96,7 +96,7 @@ checkServer() {
 
 startServer() {
     # Start a new tmux session running the bedrock server
-    tmux new-session -d -s minecraftserver "LD_LIBRARY_PATH=$server_dir $version_file"
+    tmux new-session -d -s minecraftserver -c "$server_dir" "LD_LIBRARY_PATH=$server_dir $version_file"
 
     sleep 3
 
