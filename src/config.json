@@ -1,6 +1,6 @@
 {
     "script": {
-        "server_dir": "/home/server/bedrock-server",
+        "server_dir": "/bedrock-server",
         "version_file": "",
         "tmp_dir": "",
         "log_file": "",
@@ -14,9 +14,9 @@
         "channel_id": ""
     },
     "google": {
-        "credentials": "",
-        "token": "",
+        "credentials_path": "",
+        "token_path": "",
         "drive_folder": "",
-        "local_folder": "",
+        "local_folder": ""
     }
 }
