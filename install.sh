@@ -42,11 +42,19 @@ elif command -v yum &> /dev/null; then
     sudo python3 -m pip install "${PYTHON_DEPS[@]}"
 else
     echo "Please install: ${DEPS[*]}"
+    exit 1
 fi
 
 downloadURL=$(chromium-browser --mute-audio --log-level=3 --headless --disable-gpu --dump-dom -no-sandbox --user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36" "https://www.minecraft.net/en-us/download/server/bedrock" | grep -Eo 'https://www\.minecraft\.net/bedrockdedicatedserver/bin-linux/bedrock-server-[0-9.]+\.zip')
 newVersion=$(echo "$downloadURL" | sed -n 's/.*bedrock-server-\([0-9.]*\)\.zip/\1/p')
-mv "$BASE_PATH/bedrock_server" "$BASE_PATH/bedrock-server-$newVersion"
+if [[ ! -f "$BASE_PATH/bedrock_server" ]]; then
+    echo "Could not find bedrock_server running at $BASE_PATH."
+    exit 1
+else
+    echo "Found bedrock_server."
+    echo "Renaming bedrock_server to bedrock-server-$newVersion"
+    mv "$BASE_PATH/bedrock_server" "$BASE_PATH/bedrock-server-$newVersion"
+
 echo "[*] Installing script to $INSTALL_PATH..."
 sudo mkdir -p "$INSTALL_PATH"
 
