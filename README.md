@@ -1,4 +1,8 @@
 # 🛠️ BedrockServer
+<div style="background: rgba(126, 126, 126, 1); border: 1px dashed rgba(215, 215, 215, 1); border-radius: 2px; padding: 1rem; margin-bottom: 1rem">
+ <span style="font-weight: bold; color: #EDA900; padding-right: 0.5rem;">⚠ IN ALPHA</span>
+There may be unexpected bugs or behavior. Submit an <a style="color:rgba(216, 219, 11, 1)" href="https://github.com/LlamaWhisp3r3r/BedrockServer/issues">issue</a> if believe you have experienced a bug/issue.
+</div>
 
 ## 🔍 Overview
 ***BedrockServer*** is a cron job-based service manager designed for Minecraft Bedrock Edition servers on Linux. It automates essential server management tasks, ensuring smooth operation with minimal manual intervention.
@@ -24,6 +28,10 @@ chmod +x ./install.sh
 ./install.sh
 rm ./install.sh
 ```
+
+#### ✅ You should not be good to go! Simply connect to your server as you usually would.
+
+## 📖 Documentation
 
 ### Install Script Arguments
 ***install.sh*** has the following arguments you can use to make sure it installed correctly:
