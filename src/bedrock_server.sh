@@ -86,12 +86,11 @@ checkGlobalVariables() {
 }
 
 sendDiscord() {
-    local level="$1"
     local message="$2"
     if [ "$discord_enabled" = true ]; then
         log "$infoLevel" "Sending discord message, $message"
         source "$venv_path/bin/activate"
-        python discord_handler.py "$level" "$config_file" "$message"
+        python discord_handler.py "$config_file" "$message"
     fi
 }
 
@@ -116,7 +115,7 @@ startServer() {
         # TODO: server did not start correctly. Send error message
         local errorMessage="Server did not start correctly."
         log "$criticalLevel" "$errorMessage"
-        sendDiscord "$criticalLevel" "$errorMessage"
+        sendDiscord "$errorMessage"
         return 1
     fi
     log "$infoLevel" "Server started correctly."
@@ -156,7 +155,7 @@ restartServer() {
         # Server did not stop properly
         local errorMessage="Server did not stop properly."
         log "$criticalLevel" "$errorMessage"
-        sendDiscord "$criticalLevel" "$errorMessage"
+        sendDiscord "$errorMessage"
         return 1
     else
         downloadLatestBedrock

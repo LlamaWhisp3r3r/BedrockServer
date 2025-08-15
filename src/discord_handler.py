@@ -4,18 +4,17 @@ import requests
 import logging
 
 # Ensure a message is provided
-if len(sys.argv) < 4:
-    print("Usage: python discord_handler.py warning_level config_file warning_message")
+if len(sys.argv) < 3:
+    print("Usage: python discord_handler.py config_file warning_message")
     sys.exit(1)
 
 # Combine all arguments into a single string (so no need for quotes)
-message = " ".join(sys.argv[3:])
-config_file = " ".join(sys.argv[2])
-warning_level = " ".join(sys.argv[1])
+message = " ".join(sys.argv[2:])
+config_file = " ".join(sys.argv[1])\
 
 # --- Load Config ---
 try:
-    with open("config.json", "r") as f:
+    with open(config_file, "r") as f:
         config = json.load(f)
 except FileNotFoundError:
     print("Error: config.json not found.")
