@@ -1,6 +1,6 @@
 #!/bin/bash
-base_path="$1"
-config_file="${2:-$base_path/config.json}"
+maintenance_dir="$1"
+config_file="${2:-$maintenance_dir/config.json}"
 if [[ ! -f $config_file ]]; then
     echo "Could not find config.json at $config_file"
     exit 1
@@ -19,8 +19,8 @@ warningLevel="WARNING"
 
 log() {
     # Check if logs and log file exists. If not, create them
-    if [[ ! -d "$base_path/logs" ]]; then
-        mkdir "$base_path/logs"
+    if [[ ! -d "$maintenance_dir/logs" ]]; then
+        mkdir "$maintenance_dir/logs"
     fi
     if [[ ! -f "$log_file" ]]; then
         touch "$log_file"
@@ -36,8 +36,14 @@ checkGlobalVariables() {
     # Check server_dir was provided and exists
     if [[ -z "$server_dir" || ! -d "$server_dir" ]]; then
         log "$criticalLevel" "No server_dir provided or it doesn't exist."
-        return 1
+        exit 1
     fi
+
+    if [[ -z "$maintenance_dir" ]]; then
+        maintenance_dir="$server_dir/maintenance"
+    elif [[ ! -d "$maintenance_dir" ]]; then
+        log "$criticalLevel" "$maintenance_dir does not exist!"
+        exit 1
 
     # Check version_file
     if [[ -n "$version_file" ]]; then
@@ -55,17 +61,17 @@ checkGlobalVariables() {
 
     # Check tmp_dir
     if [[ -z "$tmp_dir" ]]; then
-        tmp_dir="$server_dir/maintenance/tmp"
+        tmp_dir="$maintenance_dir/tmp"
     fi
 
     # Check log_file
     if [[ -z "$log_file" ]]; then
-        log_file="$server_dir/maintenance/logs/server.log"
+        log_file="$maintenance_dir/logs/server.log"
     fi
 
     # Check back_folder
     if [[ -z "$backup_folder" ]]; then
-        backup_folder="$server_dir/maintenance/backups"
+        backup_folder="$maintenance_dir/backups"
     fi
 
     # Check discord_enabled
@@ -80,7 +86,7 @@ checkGlobalVariables() {
 
     # Check tmp_dir
     if [[ -z "$tmp_dir" ]]; then
-        tmp_dir="$server_dir/maintenance/venv"
+        tmp_dir="$maintenance_dir/venv"
     fi
 
 }
