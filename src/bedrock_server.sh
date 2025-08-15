@@ -1,6 +1,10 @@
 #!/bin/bash
 base_path="$1"
 config_file="${2:-$base_path/config.json}"
+if [[ ! -f $config_file ]]; then
+    echo "Could not find config.json at $config_file"
+    exit 1
+fi
 server_dir=$(jq -r '.script.server_dir // empty' $config_file)
 version_file=$(jq -r '.script.version_file // empty' $config_file)
 tmp_dir=$(jq -r '.script.tmp_dir // empty' $config_file)
