@@ -58,8 +58,8 @@ Sample config.json:
         "channel_id": ""
     },
     "google": {
-        "credentials": "",
-        "token": "",
+        "credentials_path": "",
+        "token_path": "",
         "drive_folder": "",
         "local_folder": ""
     }
