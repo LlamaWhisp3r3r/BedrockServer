@@ -156,7 +156,7 @@ restartServer() {
         local errorMessage="Server did not stop properly."
         log "$criticalLevel" "$errorMessage"
         sendDiscord "$errorMessage"
-        return 1
+        exit 1
     else
         downloadLatestBedrock
         backupServer
@@ -165,8 +165,8 @@ restartServer() {
             source "$venv_path/bin/activate"
             python google_drive_handler.py "$config_file"
         fi
-        startServer
     fi
+    startServer
 }
 
 downloadLatestBedrock() {
