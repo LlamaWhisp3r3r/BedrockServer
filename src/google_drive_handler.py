@@ -49,8 +49,9 @@ set_logging()
 
 def authenticate():
     creds = None
-    token_path = config.get("google", {}).get("token_path", "token.json")
-    credentials_path = config.get("google", {}).get("credentials_path", "credentials.json")
+    local_file_path = config.get("script", {}).get("server_dir", "")
+    token_path = config.get("google", {}).get("token_path", f"{local_file_path}/maintenance/token.json")
+    credentials_path = config.get("google", {}).get("credentials_path", f"{local_file_path}/maintenance/credentials.json")
 
     if os.path.exists(token_path):
         creds = Credentials.from_authorized_user_file(token_path, SCOPES)
@@ -133,7 +134,7 @@ def upload_folder(service, parent_folder_id, local_path):
 
 def upload_backup_folder(service):
     backup_folder_name = config.get("google", {}).get("drive_folder", "Backups")
-    local_file_path = config.get("google", {}).get("local_folder", "")
+    local_file_path = config.get("script", {}).get("server_dir", "")
 
     backup_folder_id = get_folder_id_from_name(service, backup_folder_name)
     oldest_file = oldest_file_in_folder(service, backup_folder_id)
