@@ -35,7 +35,7 @@ checkGlobalVariables() {
 
     # Check server_dir was provided and exists
     if [[ -z "$server_dir" || ! -d "$server_dir" ]]; then
-        echo "No server_dir provided or it doesn't exist."
+        log "$criticalLevel" "No server_dir provided or it doesn't exist."
         return 1
     fi
 
@@ -48,8 +48,8 @@ checkGlobalVariables() {
         if [[ -e "${files[0]}" ]]; then
             version_file="${files[0]}"
         else
-            echo "No version file found in $server_dir"
-            return 1
+            log "$criticalLevel" "No version file found in $server_dir"
+            exit 1
         fi
     fi
 
