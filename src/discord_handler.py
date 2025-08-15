@@ -1,45 +1,62 @@
-import requests
 import json
-import os
+import sys
+import requests
 import logging
-import argparse
 
-# Load the JSON config
-config_path = os.path.join(os.path.dirname(__file__), "config.json")
+# Ensure a message is provided
+if len(sys.argv) < 4:
+    print("Usage: python discord_handler.py warning_level config_file warning_message")
+    sys.exit(1)
 
-with open(config_path, "r") as f:
-    config = json.load(f)
+# Combine all arguments into a single string (so no need for quotes)
+message = " ".join(sys.argv[3:])
+config_file = " ".join(sys.argv[2])
+warning_level = " ".join(sys.argv[1])
 
-# Extract logging settings with defaults if keys are missing
-log_file = config.get("logging", {}).get("log_file", "discord_bot.log")
-log_level_str = config.get("logging", {}).get("log_level", "INFO").upper()
+# --- Load Config ---
+try:
+    with open("config.json", "r") as f:
+        config = json.load(f)
+except FileNotFoundError:
+    print("Error: config.json not found.")
+    sys.exit(1)
+except json.JSONDecodeError:
+    print("Error: config.json is not valid JSON.")
+    sys.exit(1)
 
-# Convert string log level to logging module level
-log_level = getattr(logging, log_level_str, logging.INFO)
+BOT_TOKEN = config.get("discord", {}).get("bot_token")
+CHANNEL_ID = config.get("discord", {}).get("channel_id")
+log_file = config.get("script", {}).get("log_file")
 
-# Set up logging using config values
+if not log_file:
+    log_file = config.get("script", {}).get("server_dir") + "/maintenance/logs/server.log"
+
+# --- Logging Setup ---
 logging.basicConfig(
     filename=log_file,
-    filemode="a",
-    format="%(asctime)s - %(levelname)s - %(message)s",
-    level=log_level
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s"
 )
 
-BOT_TOKEN = ""
-CHANNEL_ID = ""
+if not BOT_TOKEN or not CHANNEL_ID:
+    logging.critical("BOT_TOKEN or CHANNEL_ID missing from config.json")
+    print("Error: BOT_TOKEN or CHANNEL_ID missing from config.json")
+    sys.exit(1)
 
-def send_message(content):
-    url = f"https://discord.com/api/v10/channels/{CHANNEL_ID}/messages"
-    headers = {
-        "Authorization": f"Bot {BOT_TOKEN}",
-        "Content-Type": "application/json"
-    }
-    json_data = {"content": content}
-    r = requests.post(url, headers=headers, json=json_data)
-    if r.status_code == 200 or r.status_code == 204:
-        logging.info("Message sent successfully")
+# Send message to Discord
+url = f"https://discord.com/api/v9/channels/{CHANNEL_ID}/messages"
+headers = {
+    "Authorization": f"Bot {BOT_TOKEN}",
+    "Content-Type": "application/json"
+}
+payload = {"content": message}
+
+try:
+    response = requests.post(url, headers=headers, json=payload)
+    if response.status_code == 200:
+        logging.info(f"Message sent successfully: {message}")
     else:
-        print(f"Failed to send message: {r.status_code}, {r.text}")
-
-# Example usage
-send_message("🚨 The server is DOWN!")
+        logging.error(f"Failed to send message ({response.status_code}): {response.text}")
+except requests.RequestException as e:
+    logging.exception("Request to Discord API failed.")
+    pass

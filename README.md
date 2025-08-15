@@ -24,11 +24,7 @@ chmod +x ./install.sh
 ./install.sh
 rm ./install.sh
 ```
-### Set Executable Permissions:
 
-```bash
-chmod +x bedrock_server.sh
-```
 ### ⚙️ Configuration:
 Edit the config.json file to set your server paths, notification settings, and other preferences.
 Sample config.json:
@@ -36,13 +32,14 @@ Sample config.json:
 ```json
 {
     "script": {
-        "server_dir": "/home/server/bedrock-server",
+        "server_dir": "/bedrock-server",
         "version_file": "",
         "tmp_dir": "",
         "log_file": "",
         "backup_folder": "",
         "discord_enabled": false,
-        "google_enabled": false
+        "google_enabled": false,
+        "venv_path": ""
     },
     "discord": {
         "bot_token": "",
@@ -57,17 +54,6 @@ Sample config.json:
 }
 ```
 
-### Set Up Cron Job:
-Schedule the script to run at your desired intervals using cron:
-
-```bash
-crontab -e
-```
-Add the following line to run the script every minute:
-
-```cron
-* * * * * /full/path/to/bedrock_server.sh
-```
 
 ## 📦 Dependencies
 ### 🐚 Shell
@@ -79,6 +65,8 @@ Add the following line to run the script every minute:
 ### 🐍Python > 3.5
 - requests
 - google-api-python-client
+- logging
+- datetime
 
 
 ## 🤝 Contributing

@@ -1,21 +1,22 @@
 #!/bin/bash
-
-
-server_dir=$(jq -r '.script.server_dir // empty' config.json)
-version_file=$(jq -r '.script.version_file // empty' config.json)
-tmp_dir=$(jq -r '.script.tmp_dir // empty' config.json)
-log_file=$(jq -r '.script.log_file // empty' config.json)
-backup_folder=$(jq -r '.script.backup_folder // empty' config.json)
-discord_enabled=$(jq -r '.script.discord_enabled // empty' config.json)
-google_enabled=$(jq -r '.script.google_enabled // empty' config.json)
+base_path="$1"
+config_file="${2:-$base_path/config.json}"
+server_dir=$(jq -r '.script.server_dir // empty' $config_file)
+version_file=$(jq -r '.script.version_file // empty' $config_file)
+tmp_dir=$(jq -r '.script.tmp_dir // empty' $config_file)
+log_file=$(jq -r '.script.log_file // empty' $config_file)
+backup_folder=$(jq -r '.script.backup_folder // empty' $config_file)
+discord_enabled=$(jq -r '.script.discord_enabled // empty' $config_file)
+google_enabled=$(jq -r '.script.google_enabled // empty' $config_file)
+venv_path=$(jq -r '.script.venv_path // empty' $config_file)
 criticalLevel="CRITICAL"
 infoLevel="INFO"
 warningLevel="WARNING"
 
 log() {
     # Check if logs and log file exists. If not, create them
-    if [[ ! -d "$server_dir/logs" ]]; then
-        mkdir "$server_dir/logs"
+    if [[ ! -d "$base_path/logs" ]]; then
+        mkdir "$base_path/logs"
     fi
     if [[ ! -f "$log_file" ]]; then
         touch "$log_file"
@@ -27,6 +28,7 @@ log() {
 }
 
 checkGlobalVariables() {
+
     # Check server_dir was provided and exists
     if [[ -z "$server_dir" || ! -d "$server_dir" ]]; then
         echo "No server_dir provided or it doesn't exist."
@@ -49,17 +51,17 @@ checkGlobalVariables() {
 
     # Check tmp_dir
     if [[ -z "$tmp_dir" ]]; then
-        tmp_dir="$server_dir/tmp"
+        tmp_dir="$server_dir/maintenance/tmp"
     fi
 
     # Check log_file
     if [[ -z "$log_file" ]]; then
-        log_file="$server_dir/logs/server.log"
+        log_file="$server_dir/maintenance/logs/server.log"
     fi
 
     # Check back_folder
     if [[ -z "$backup_folder" ]]; then
-        backup_folder="$server_dir/backups"
+        backup_folder="$server_dir/maintenance/backups"
     fi
 
     # Check discord_enabled
@@ -72,6 +74,11 @@ checkGlobalVariables() {
         google_enabled=false
     fi
 
+    # Check tmp_dir
+    if [[ -z "$tmp_dir" ]]; then
+        tmp_dir="$server_dir/maintenance/venv"
+    fi
+
 }
 
 sendDiscord() {
@@ -79,7 +86,8 @@ sendDiscord() {
     local message="$2"
     if [ "$discord_enabled" = true ]; then
         log "$infoLevel" "Sending discord message, $message"
-        python discord_handler.py "$level" "$message"
+        source "$venv_path/bin/activate"
+        python discord_handler.py "$level" "$config_file" "$message"
     fi
 }
 
@@ -151,7 +159,8 @@ restartServer() {
         backupServer
         if [ "$google_enabled" = true ]; then
             log "$infoLevel" "Backing up server to Google Drive."
-            python google_drive_handler.py
+            source "$venv_path/bin/activate"
+            python google_drive_handler.py "$config_file"
         fi
         startServer
     fi
