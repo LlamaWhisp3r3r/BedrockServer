@@ -1,13 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-# Default values
-SCRIPT_DOWNLOAD_URL="https://github.com/LlamaWhisp3r3r/BedrockServer/archive/refs/heads/main.zip"
 BASE_PATH=/bedrock-server
-INSTALL_PATH=/bedrock-server/maintenance
-VENV_PATH="$INSTALL_PATH/venv"
-DEPS=("jq" "chromium-browser" "python3" "python3-pip" "python3-venv")
-PYTHON_DEPS=("requests" "google-api-python-client")
 
 usage() {
     echo "Usage: $0 [-n script_download_url] [-p install_path] [-e venv_directory]"
@@ -19,15 +13,23 @@ usage() {
 }
 
 # Parse command-line arguments
-while getopts "n:p:c:h" opt; do
+while getopts "n:p:c:h:b:" opt; do
     case "$opt" in
         n) SCRIPT_NAME="$OPTARG" ;;
+        b) BASE_PATH="$OPTARG" ;;
         p) INSTALL_PATH="$OPTARG" ;;
         e) VENV_PATH="$OPTARG" ;;
         h) usage ;;
         *) usage ;;
     esac
 done
+
+# Default values
+SCRIPT_DOWNLOAD_URL="https://github.com/LlamaWhisp3r3r/BedrockServer/archive/refs/heads/main.zip"
+INSTALL_PATH=$BASE_PATH/maintenance
+VENV_PATH="$INSTALL_PATH/venv"
+DEPS=("jq" "chromium" "python3" "python3-pip" "python3-venv")
+PYTHON_DEPS=("requests" "google-api-python-client")
 
 echo "[*] Installing dependencies..."
 if command -v apt-get &> /dev/null; then
@@ -47,7 +49,7 @@ fi
 
 downloadURL=$(chromium-browser --mute-audio --log-level=3 --headless --disable-gpu --dump-dom -no-sandbox --user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36" "https://www.minecraft.net/en-us/download/server/bedrock" | grep -Eo 'https://www\.minecraft\.net/bedrockdedicatedserver/bin-linux/bedrock-server-[0-9.]+\.zip')
 newVersion=$(echo "$downloadURL" | sed -n 's/.*bedrock-server-\([0-9.]*\)\.zip/\1/p')
-if [[ ! -f "$BASE_PATH/bedrock_server" ]]; then
+if [[ ! -e "$BASE_PATH/bedrock_server" ]]; then
     echo "Could not find bedrock_server running at $BASE_PATH."
     exit 1
 else

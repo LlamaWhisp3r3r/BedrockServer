@@ -44,6 +44,7 @@ checkGlobalVariables() {
     elif [[ ! -d "$maintenance_dir" ]]; then
         log "$criticalLevel" "$maintenance_dir does not exist!"
         exit 1
+    fi
 
     # Check version_file
     if [[ -n "$version_file" ]]; then
@@ -186,7 +187,7 @@ downloadLatestBedrock() {
 
     # Fetch download URL from Mojang's official site using chromium
     local downloadURL
-    downloadURL=$(chromium-browser --mute-audio --log-level=3 --headless --disable-gpu --dump-dom -no-sandbox --user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36" "https://www.minecraft.net/en-us/download/server/bedrock" | grep -Eo 'https://www\.minecraft\.net/bedrockdedicatedserver/bin-linux/bedrock-server-[0-9.]+\.zip')
+    downloadURL=$(chromium --mute-audio --log-level=3 --headless --disable-gpu --dump-dom -no-sandbox --user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36" "https://www.minecraft.net/en-us/download/server/bedrock" | grep -Eo 'https://www\.minecraft\.net/bedrockdedicatedserver/bin-linux/bedrock-server-[0-9.]+\.zip')
     local newVersion=$(echo "$downloadURL" | sed -n 's/.*bedrock-server-\([0-9.]*\)\.zip/\1/p')
     # Check if it was able to get new version
     if [[ -z "$downloadURL" ]]; then
