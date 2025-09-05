@@ -183,6 +183,7 @@ downloadLatestBedrock() {
     else
         # Clean up temp folder
         rm -rf "$tmp_dir"
+        mkdir -p "$tmp_dir"
     fi
 
     # Fetch download URL from Mojang's official site using chromium
@@ -214,12 +215,13 @@ downloadLatestBedrock() {
                 exit 1
             fi
             unzip -ou "$tmp_dir/$zipFilename.zip" -d "$tmp_dir"
-            rsync -av --exclude='permissions.json' --exclude='server.properties' --exclude='allowlist.json' --exclude='*.zip' "$tmp_dir/" "$server_dir"
+            rsync -a --no-times --exclude='permissions.json' --exclude='server.properties' --exclude='allowlist.json' --exclude='*.zip' "$tmp_dir/" "$server_dir"
             mv "$server_dir/bedrock_server" "$server_dir/bedrock-server-$newVersion"
             rm "$version_file"
             log "$infoLevel" "Downloaded and installed new server version: $newVersion."
+        else
+            log "$infoLevel" "Current version: $currentVersion is the same as new version: $newVersion."
         fi
-        log "$infoLevel" "Current version: $currentVersion is the same as new version: $newVersion."
     fi
 }
 

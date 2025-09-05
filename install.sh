@@ -99,7 +99,7 @@ if [[ ! -f "$INSTALL_PATH" ]]; then
     sudo find "$BASE_PATH" -type d -exec chmod g+s {} \;
 
     # Define the cron job
-    CRON_JOB="* * * * * $INSTALL_PATH/bedrock_server.sh $INSTALL_PATH >> $INSTALL_PATH/maintenance/cron.log 2>&1"
+    CRON_JOB="* * * * * $INSTALL_PATH/bedrock_server.sh $INSTALL_PATH"
     echo "CRONJOB! $CRON_JOB"
 
     # Install the cron job
