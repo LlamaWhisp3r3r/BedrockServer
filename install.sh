@@ -33,7 +33,7 @@ fi
 SCRIPT_DOWNLOAD_URL="https://github.com/LlamaWhisp3r3r/BedrockServer/archive/refs/heads/main.zip"
 INSTALL_PATH=$BASE_PATH/maintenance
 VENV_PATH="$INSTALL_PATH/venv"
-DEPS=("jq" "chromium" "python3" "python3-pip" "python3-venv")
+DEPS=("jq" "chromium" "python3" "python3-pip" "python3-venv", tmux)
 PYTHON_DEPS=("requests" "google-api-python-client")
 
 echo "[*] Installing dependencies..."
@@ -52,7 +52,7 @@ else
     exit 1
 fi
 
-downloadURL=$(chromium-browser --mute-audio --log-level=3 --headless --disable-gpu --dump-dom -no-sandbox --user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36" "https://www.minecraft.net/en-us/download/server/bedrock" | grep -Eo 'https://www\.minecraft\.net/bedrockdedicatedserver/bin-linux/bedrock-server-[0-9.]+\.zip')
+downloadURL=$(chromium --mute-audio --log-level=3 --headless --disable-gpu --dump-dom -no-sandbox --user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36" "https://www.minecraft.net/en-us/download/server/bedrock" | grep -Eo 'https://www\.minecraft\.net/bedrockdedicatedserver/bin-linux/bedrock-server-[0-9.]+\.zip')
 newVersion=$(echo "$downloadURL" | sed -n 's/.*bedrock-server-\([0-9.]*\)\.zip/\1/p')
 if [[ ! -e "$BASE_PATH/bedrock_server" ]]; then
     echo "Could not find bedrock_server running at $BASE_PATH."
@@ -90,6 +90,7 @@ if [[ ! -f "$INSTALL_PATH" ]]; then
     fi
     sudo usermod -aG bedrockgroup $USER
     sudo usermod -aG bedrockgroup bedrockserver
+    sudo usermod -s /bin/bash bedrockserver
     sudo chgrp -R bedrockgroup "$BASE_PATH"
     sudo chmod -R 770 "$BASE_PATH"
     sudo find "$BASE_PATH" -type d -exec chmod g+s {} \;
@@ -98,8 +99,8 @@ if [[ ! -f "$INSTALL_PATH" ]]; then
     CRON_JOB="* * * * * $INSTALL_PATH/bedrock_server.sh $INSTALL_PATH >> $INSTALL_PATH/cron.log 2>&1"
     echo "CRONJOB! $CRON_JOB"
 
-    # Install the cron job if it's not already present
-    ( sudo crontab -u bedrockserver -l 2>/dev/null | grep -F "$CRON_JOB" ) || (sudo crontab -u bedrockserver -l 2>/dev/null; echo "$CRON_JOB") | sudo -u bedrockserver crontab - 
+    # Install the cron job
+    (sudo crontab -u bedrockserver -l 2>/dev/null; echo "$CRON_JOB") | sudo crontab -u bedrockserver - 
 else
     echo "Could not create maintenance directory at $INSTALL_PATH"
     exit 1
