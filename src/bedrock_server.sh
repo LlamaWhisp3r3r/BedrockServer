@@ -190,10 +190,10 @@ downloadLatestBedrock() {
     downloadURL=$(chromium --mute-audio --log-level=3 --headless --disable-gpu --dump-dom -no-sandbox --user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36" "https://www.minecraft.net/en-us/download/server/bedrock" | grep -Eo 'https://www\.minecraft\.net/bedrockdedicatedserver/bin-linux/bedrock-server-[0-9.]+\.zip')
     local newVersion=$(echo "$downloadURL" | sed -n 's/.*bedrock-server-\([0-9.]*\)\.zip/\1/p')
     # Check if it was able to get new version
-    if [[ -z "$downloadURL" ]]; then
+    if [[ -z "$newVersion" ]]; then
         # Could not get new version number
         log "$warningLevel" "Could not download new version number from Minecraft website."
-        return 1
+        exit 1
     else
         # Compute future .zip file
         local zipFilename
@@ -208,11 +208,11 @@ downloadLatestBedrock() {
             rm "$version_file"
             if ! wget -O "$tmp_dir/$zipFilename.zip" "$downloadURL"; then
                 log "$criticalLevel" "Failed to download $downloadURL"
-                return 1
+                exit 1
             fi
             if [ ! -s "$tmp_dir/$zipFilename.zip" ]; then
                 log "$criticalLevel" "Downloaded file is empty: $zipFilename.zip"
-                return 1
+                exit 1
             fi
             unzip -ou "$tmp_dir/$zipFilename.zip" -d "$tmp_dir"
             rsync -av --exclude='permissions.json' \
@@ -238,5 +238,5 @@ backupServer() {
 }
 
 if checkGlobalVariables; then
-    startServer
+    checkServer
 fi

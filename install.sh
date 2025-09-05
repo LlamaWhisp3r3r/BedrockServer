@@ -51,11 +51,11 @@ downloadURL=$(chromium-browser --mute-audio --log-level=3 --headless --disable-g
 newVersion=$(echo "$downloadURL" | sed -n 's/.*bedrock-server-\([0-9.]*\)\.zip/\1/p')
 if [[ ! -e "$BASE_PATH/bedrock_server" ]]; then
     echo "Could not find bedrock_server running at $BASE_PATH."
-    exit 1
 else
     echo "Found bedrock_server."
     echo "Renaming bedrock_server to bedrock-server-$newVersion"
     mv "$BASE_PATH/bedrock_server" "$BASE_PATH/bedrock-server-$newVersion"
+fi
 
 echo "[*] Installing script to $INSTALL_PATH..."
 sudo mkdir -p "$INSTALL_PATH"
@@ -90,7 +90,7 @@ if [[ ! -f "$INSTALL_PATH" ]]; then
     sudo find "$BASE_PATH" -type d -exec chmod g+s {} \;
 
     # Define the cron job
-    CRON_JOB="* * * * *  $INSTALL_PATH/bedrock_server.sh $INSTALL_PATH >> $INSTALL_PATH/cron.log 2>&1"
+    CRON_JOB="* * * * * $INSTALL_PATH/bedrock_server.sh $INSTALL_PATH >> $INSTALL_PATH/cron.log 2>&1"
     echo "CRONJOB! $CRON_JOB"
 
     # Install the cron job if it's not already present
