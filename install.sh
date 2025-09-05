@@ -91,7 +91,7 @@ if [[ ! -f "$INSTALL_PATH" ]]; then
     sudo usermod -aG bedrockgroup $USER
     sudo usermod -aG bedrockgroup bedrockserver
     sudo usermod -s /bin/bash bedrockserver
-    dir=$server_dir
+    dir="$server_dir"
     while [ "$dir" != "/" ]; do
         sudo chgrp bedrockgroup "$dir"
         sudo chmod g+x "$dir"
