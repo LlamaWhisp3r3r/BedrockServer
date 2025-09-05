@@ -165,8 +165,8 @@ restartServer() {
         sendDiscord "$errorMessage"
         exit 1
     else
-        downloadLatestBedrock
         backupServer
+        downloadLatestBedrock
         if [ "$google_enabled" = true ]; then
             log "$infoLevel" "Backing up server to Google Drive."
             source "$venv_path/bin/activate"
@@ -215,11 +215,7 @@ downloadLatestBedrock() {
                 exit 1
             fi
             unzip -ou "$tmp_dir/$zipFilename.zip" -d "$tmp_dir"
-            rsync -av --exclude='permissions.json' \
-                --exclude='server.properties' \
-                --exclude='allowlist.json' \
-                --exclude='*.zip' \
-                "$tmp_dir/" "$server_dir"
+            rsync -av --exclude='permissions.json' --exclude='server.properties' --exclude='allowlist.json' --exclude='*.zip' "$tmp_dir/" "$server_dir"
             mv "$server_dir/bedrock_server" "$server_dir/bedrock-server-$newVersion"
             log "$infoLevel" "Downloaded and installed new server version: $newVersion."
         fi
