@@ -72,16 +72,19 @@ if [[ ! -f "$INSTALL_PATH" ]]; then
         exit 1
     fi
 
+    echo "[*] Unzipping and setting up maintenance files."
     sudo unzip -oj "$INSTALL_PATH/main.zip" "BedrockServer-main/src/*" -d "$INSTALL_PATH/"
     sudo chmod +x "$INSTALL_PATH/bedrock_server.sh"
     sudo rm -f "$INSTALL_PATH/main.zip"
     # Update config file to match parameters passed to script
+    echo "[*] Adding parameters to $INSTALL_PATH/config.json"
     sudo jq --arg serverdir "$BASE_PATH" --arg venvpath "$VENV_PATH" '.script.server_dir = $serverdir | .script.venv_path = $venvpath' $INSTALL_PATH/config.json > tmp.$$.json && sudo mv -f tmp.$$.json $INSTALL_PATH/config.json
 
+    echo "[*] Setting up service account: bedrockserver, and service group: bedrockgroup"
     if id -u bedrockserver >/dev/null 2>&1; then
         echo "User 'username' already exists, skipping useradd."
     else
-        sudo useradd --system --no-create-home --shell /usr/sbin/nologin bedrockserver
+        sudo useradd --system --no-create-home --shell /bin/bash bedrockserver
     fi
     if getent group bedrockgroup >/dev/null 2>&1; then
         echo "Group 'bedrockgroup' already exists, skipping groupadd."
@@ -90,29 +93,34 @@ if [[ ! -f "$INSTALL_PATH" ]]; then
     fi
     sudo usermod -aG bedrockgroup $USER
     sudo usermod -aG bedrockgroup bedrockserver
-    sudo usermod -s /bin/bash bedrockserver
+
+    echo "[*] Setting directory permissions."
     dir="$BASE_PATH"
-    while [ -n "$DIR" ] && [ "$dir" != "/" ]; do
+    while [ "$dir" != "/" ]; do
         sudo chgrp bedrockgroup "$dir"
         sudo chmod g+x "$dir"
         dir=$(dirname "$dir")
     done
+    
+    echo "[*] Changing worlds permissions if it exists"
     if [[ -d "$BASE_PATH/worlds/" ]]; then
         sudo chmod -R g+w "$BASE_PATH/worlds/"
     fi
+
+    echo "[*] Changing current directory's permissions"
     sudo chgrp -R bedrockgroup "$BASE_PATH"
     sudo chmod -R 770 "$BASE_PATH"
     sudo find "$BASE_PATH" -type d -exec chmod g+s {} \;
 
     # Define the cron job
     CRON_JOB="* * * * * $INSTALL_PATH/bedrock_server.sh $INSTALL_PATH"
-    echo "CRONJOB! $CRON_JOB"
 
     # Install the cron job
-    (sudo crontab -u bedrockserver -l 2>/dev/null; echo "$CRON_JOB") | sudo crontab -u bedrockserver - 
+    echo "$CRON_JOB" | sudo crontab -u bedrockserver - 
+    echo "[*] CRONJOB INSTALLED: $(sudo crontab -u bedrockserver -l)"
 else
     echo "Could not create maintenance directory at $INSTALL_PATH"
     exit 1
 fi
 
-echo "[✔ ] Installation complete!"
+echo "Installation complete!"
