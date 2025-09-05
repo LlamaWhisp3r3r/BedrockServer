@@ -6,7 +6,7 @@ BASE_PATH=/bedrock-server
 usage() {
     echo "Usage: $0 [-n script_download_url] [-p install_path] [-e venv_directory]"
     echo "  -n  Script download url (default: $SCRIPT_DOWNLOAD_URL)"
-    echo "  -b  Base server directory (default: $BASE_PATH)"
+    echo "  -b  Base maintenance server directory (default: $BASE_PATH)"
     echo "  -p  Install path (default: $INSTALL_PATH)"
     echo "  -e  Venv directory (default: $VENV_PATH)"
     exit 1
@@ -33,7 +33,7 @@ fi
 SCRIPT_DOWNLOAD_URL="https://github.com/LlamaWhisp3r3r/BedrockServer/archive/refs/heads/main.zip"
 INSTALL_PATH=$BASE_PATH/maintenance
 VENV_PATH="$INSTALL_PATH/venv"
-DEPS=("jq" "chromium" "python3" "python3-pip" "python3-venv", tmux)
+DEPS=("jq" "chromium" "python3" "python3-pip" "python3-venv" "tmux")
 PYTHON_DEPS=("requests" "google-api-python-client")
 
 echo "[*] Installing dependencies..."
@@ -91,12 +91,15 @@ if [[ ! -f "$INSTALL_PATH" ]]; then
     sudo usermod -aG bedrockgroup $USER
     sudo usermod -aG bedrockgroup bedrockserver
     sudo usermod -s /bin/bash bedrockserver
+    if [[ -d "$BASE_PATH/worlds/" ]]; then
+        sudo chmod -R g+w "$BASE_PATH/worlds/"
+    fi
     sudo chgrp -R bedrockgroup "$BASE_PATH"
     sudo chmod -R 770 "$BASE_PATH"
     sudo find "$BASE_PATH" -type d -exec chmod g+s {} \;
 
     # Define the cron job
-    CRON_JOB="* * * * * $INSTALL_PATH/bedrock_server.sh $INSTALL_PATH >> $INSTALL_PATH/cron.log 2>&1"
+    CRON_JOB="* * * * * $INSTALL_PATH/bedrock_server.sh $INSTALL_PATH >> $INSTALL_PATH/maintenance/cron.log 2>&1"
     echo "CRONJOB! $CRON_JOB"
 
     # Install the cron job

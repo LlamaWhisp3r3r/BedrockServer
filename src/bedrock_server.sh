@@ -33,6 +33,11 @@ log() {
 
 checkGlobalVariables() {
 
+    # Check log_file
+    if [[ -z "$log_file" ]]; then
+        log_file="$maintenance_dir/logs/server.log"
+    fi
+
     # Check server_dir was provided and exists
     if [[ -z "$server_dir" || ! -d "$server_dir" ]]; then
         log "$criticalLevel" "No server_dir provided or it doesn't exist."
@@ -63,11 +68,6 @@ checkGlobalVariables() {
     # Check tmp_dir
     if [[ -z "$tmp_dir" ]]; then
         tmp_dir="$maintenance_dir/tmp"
-    fi
-
-    # Check log_file
-    if [[ -z "$log_file" ]]; then
-        log_file="$maintenance_dir/logs/server.log"
     fi
 
     # Check back_folder
@@ -120,7 +120,7 @@ startServer() {
 
     if ! tmux has-session -t minecraftserver 2>/dev/null; then
         # TODO: server did not start correctly. Send error message
-        local errorMessage="Server did not start correctly."
+        local errorMessage="Server did not start correctly. ServerDir: $server_dir, VersionFile: $version_file"
         log "$criticalLevel" "$errorMessage"
         sendDiscord "$errorMessage"
         return 1
@@ -205,7 +205,6 @@ downloadLatestBedrock() {
         # Compare versions
         if [[ "$newVersion" != "$currentVersion" ]]; then
             # New version found
-            rm "$version_file"
             if ! wget -O "$tmp_dir/$zipFilename.zip" "$downloadURL"; then
                 log "$criticalLevel" "Failed to download $downloadURL"
                 exit 1
@@ -217,6 +216,7 @@ downloadLatestBedrock() {
             unzip -ou "$tmp_dir/$zipFilename.zip" -d "$tmp_dir"
             rsync -av --exclude='permissions.json' --exclude='server.properties' --exclude='allowlist.json' --exclude='*.zip' "$tmp_dir/" "$server_dir"
             mv "$server_dir/bedrock_server" "$server_dir/bedrock-server-$newVersion"
+            rm "$version_file"
             log "$infoLevel" "Downloaded and installed new server version: $newVersion."
         fi
         log "$infoLevel" "Current version: $currentVersion is the same as new version: $newVersion."
