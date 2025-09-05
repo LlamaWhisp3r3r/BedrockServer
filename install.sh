@@ -24,6 +24,11 @@ while getopts "n:p:c:h:b:" opt; do
     esac
 done
 
+if [[ ! -d "$BASE_PATH" ]]; then
+    echo "Folder at $BASE_PATH does not exist."
+    exit 1
+fi
+
 # Default values
 SCRIPT_DOWNLOAD_URL="https://github.com/LlamaWhisp3r3r/BedrockServer/archive/refs/heads/main.zip"
 INSTALL_PATH=$BASE_PATH/maintenance
