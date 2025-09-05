@@ -51,7 +51,7 @@ else
     echo "Please install: ${DEPS[*]}"
     exit 1
 fi
-
+echo "[*] Checking newest version of server"
 downloadURL=$(chromium --mute-audio --log-level=3 --headless --disable-gpu --dump-dom -no-sandbox --user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36" "https://www.minecraft.net/en-us/download/server/bedrock" | grep -Eo 'https://www\.minecraft\.net/bedrockdedicatedserver/bin-linux/bedrock-server-[0-9.]+\.zip')
 newVersion=$(echo "$downloadURL" | sed -n 's/.*bedrock-server-\([0-9.]*\)\.zip/\1/p')
 if [[ ! -e "$BASE_PATH/bedrock_server" ]]; then
@@ -59,7 +59,7 @@ if [[ ! -e "$BASE_PATH/bedrock_server" ]]; then
 else
     echo "Found bedrock_server."
     echo "Renaming bedrock_server to bedrock-server-$newVersion"
-    mv "$BASE_PATH/bedrock_server" "$BASE_PATH/bedrock-server-$newVersion"
+    sudo mv "$BASE_PATH/bedrock_server" "$BASE_PATH/bedrock-server-$newVersion"
 fi
 
 echo "[*] Installing script to $INSTALL_PATH..."
@@ -76,7 +76,7 @@ if [[ ! -f "$INSTALL_PATH" ]]; then
     sudo chmod +x "$INSTALL_PATH/bedrock_server.sh"
     sudo rm -f "$INSTALL_PATH/main.zip"
     # Update config file to match parameters passed to script
-    jq --arg serverdir "$BASE_PATH" --arg venvpath "$VENV_PATH" '.script.server_dir = $serverdir | .script.venv_path = $venvpath' $INSTALL_PATH/config.json > tmp.$$.json && sudo mv -f tmp.$$.json $INSTALL_PATH/config.json
+    sudo jq --arg serverdir "$BASE_PATH" --arg venvpath "$VENV_PATH" '.script.server_dir = $serverdir | .script.venv_path = $venvpath' $INSTALL_PATH/config.json > tmp.$$.json && sudo mv -f tmp.$$.json $INSTALL_PATH/config.json
 
     if id -u bedrockserver >/dev/null 2>&1; then
         echo "User 'username' already exists, skipping useradd."
@@ -91,6 +91,12 @@ if [[ ! -f "$INSTALL_PATH" ]]; then
     sudo usermod -aG bedrockgroup $USER
     sudo usermod -aG bedrockgroup bedrockserver
     sudo usermod -s /bin/bash bedrockserver
+    dir=$server_dir
+    while [ "$dir" != "/" ]; do
+        sudo chgrp bedrockgroup "$dir"
+        sudo chmod g+x "$dir"
+        dir=$(dirname "$dir")
+    done
     if [[ -d "$BASE_PATH/worlds/" ]]; then
         sudo chmod -R g+w "$BASE_PATH/worlds/"
     fi
