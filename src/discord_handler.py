@@ -9,8 +9,8 @@ if len(sys.argv) < 3:
     sys.exit(1)
 
 # Combine all arguments into a single string (so no need for quotes)
-message = " ".join(sys.argv[2:])
-config_file = " ".join(sys.argv[1])\
+message = "".join(sys.argv[2:])
+config_file = "".join(sys.argv[1])
 
 # --- Load Config ---
 try:
