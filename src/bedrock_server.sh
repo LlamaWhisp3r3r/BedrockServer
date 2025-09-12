@@ -220,6 +220,10 @@ downloadLatestBedrock() {
             mv "$server_dir/bedrock_server" "$server_dir/bedrock-server-$newVersion"
             rm "$version_file"
             log "$infoLevel" "Downloaded and installed new server version: $newVersion."
+
+            # Set new version_file to be used in start server so it updates now
+            version_file="$server_dir/bedrock-server-$newVersion"
+
         else
             log "$infoLevel" "Current version: $currentVersion is the same as new version: $newVersion."
         fi

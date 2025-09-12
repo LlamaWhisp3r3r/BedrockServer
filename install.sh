@@ -125,4 +125,4 @@ else
     exit 1
 fi
 
-echo "Installation complete!"
+echo "[*] Installation complete!"
