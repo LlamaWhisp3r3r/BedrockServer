@@ -83,8 +83,10 @@ if [[ ! -f "$INSTALL_PATH" ]]; then
     echo "[*] Setting up service account: bedrockserver, and service group: bedrockgroup"
     if id -u bedrockserver >/dev/null 2>&1; then
         echo "User 'username' already exists, skipping useradd."
+        echo "[*] Adding correct home directory if it doesn't exist"
+        #TODO: Add home directory if it's not there.
     else
-        sudo useradd --system --no-create-home --shell /bin/bash bedrockserver
+        sudo useradd -m --shell /bin/bash bedrockserver
     fi
     if getent group bedrockgroup >/dev/null 2>&1; then
         echo "Group 'bedrockgroup' already exists, skipping groupadd."
