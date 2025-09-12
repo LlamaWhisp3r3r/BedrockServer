@@ -97,7 +97,7 @@ sendDiscord() {
     if [ "$discord_enabled" = true ]; then
         log "$infoLevel" "Sending discord message, $message"
         source "$venv_path/bin/activate"
-        python discord_handler.py "$config_file" "$message"
+        python3 "$maintenance_dir/discord_handler.py" "$config_file" "$message"
     fi
 }
 
@@ -171,7 +171,7 @@ restartServer() {
         if [ "$google_enabled" = true ]; then
             log "$infoLevel" "Backing up server to Google Drive."
             source "$venv_path/bin/activate"
-            python google_drive_handler.py "$config_file"
+            python3 "$maintenance_dir/google_drive_handler.py" "$config_file"
         fi
     fi
     startServer
