@@ -24,7 +24,7 @@ For your ease of use you can use the provided install script. This will install 
 ```bash
 wget https://raw.githubusercontent.com/LlamaWhisp3r3r/BedrockServer/refs/heads/main/install.sh
 chmod +x ./install.sh
-./install.sh
+./install.sh -b "/path/to/server/directory"
 rm ./install.sh
 ```
 
