@@ -83,8 +83,13 @@ if [[ ! -f "$INSTALL_PATH" ]]; then
     echo "[*] Setting up service account: bedrockserver, and service group: bedrockgroup"
     if id -u bedrockserver >/dev/null 2>&1; then
         echo "User 'username' already exists, skipping useradd."
-        echo "[*] Adding correct home directory if it doesn't exist"
-        #TODO: Add home directory if it's not there.
+        if [[ ! -f "/home/bedrockserver" ]]; then
+            echo "[*] Adding correct bedrockserver home directory."
+            sudo mkdir -p /home/bedrockserver
+            sudo chown bedrockserver:bedrockserver /home/bedrockserver
+            sudo chmod 700 /home/bedrockserver
+            sudo usermod -md "/home/bedrockserver"
+        fi
     else
         sudo useradd -m --shell /bin/bash bedrockserver
     fi
