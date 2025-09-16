@@ -124,7 +124,7 @@ startServer() {
         local errorMessage="Server did not start correctly. ServerDir: $server_dir, VersionFile: $version_file"
         log "$criticalLevel" "$errorMessage"
         sendDiscord "$errorMessage"
-        return 1
+        exit 1
     fi
     log "$infoLevel" "Server started correctly."
 }
