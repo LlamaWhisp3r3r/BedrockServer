@@ -90,6 +90,8 @@ if [[ ! -f "$INSTALL_PATH" ]]; then
             sudo chmod 700 /home/bedrockserver
             sudo usermod -md "/home/bedrockserver"
         fi
+        echo "[*] Making sure shell is set up correctly"
+        sudo usermod -s /bin/bash bedrockserver
     else
         sudo useradd -m --shell /bin/bash bedrockserver
     fi
